@@ -26,6 +26,9 @@ Commands:
   clean, c                    Clean orphans and obsolete packages
 
 - example: for install fastfetch run...
+  
 kyo install fastfetch
+
 or
+
 kyo i fastfetch
