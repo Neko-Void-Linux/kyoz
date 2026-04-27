@@ -11,9 +11,10 @@ cp kyo ~/.local/bin/
 ```
 sudo xbps-install -S zig 
 ```
-Usage: kyo {install|update|remove|search|clean} [arguments...]
+# Usage: 
+kyo {install|update|remove|search|clean} [arguments...]
 
-# Commands:
+Commands:
   install, i   <package...>   Install packages
   
   update, u                   Update the system
