@@ -2,10 +2,13 @@
 ```
 zig build-exe kyo.zig
 ```
-
+# INSTALL
+```
+cp kyo ~/.local/bin/ 
+```
 Usage: kyo {install|update|remove|search|clean} [arguments...]
 
-Commands:
+# Commands:
   install, i   <package...>   Install packages
   
   update, u                   Update the system
