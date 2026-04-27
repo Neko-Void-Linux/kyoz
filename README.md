@@ -6,6 +6,11 @@ zig build-exe kyo.zig
 ```
 cp kyo ~/.local/bin/ 
 ```
+
+# For compile do you need Zig
+```
+sudo xbps-install -S zig 
+```
 Usage: kyo {install|update|remove|search|clean} [arguments...]
 
 # Commands:
