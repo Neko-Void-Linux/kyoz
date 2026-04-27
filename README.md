@@ -1,0 +1,18 @@
+# COMPILE
+```
+zig build-exe kyo.zig
+```
+
+Usage: kyo {install|update|remove|search|clean} [arguments...]
+
+Commands:
+  install, i   <package...>   Install packages
+  
+  update, u                   Update the system
+  
+  remove, r    <package...>   Remove packages (with -o)
+  
+  search, s    <term...>      Search for packages
+  
+  clean, c                    Clean orphans and obsolete packages
+  
