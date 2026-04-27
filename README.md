@@ -24,4 +24,5 @@ Commands:
   search, s    <term...>      Search for packages
   
   clean, c                    Clean orphans and obsolete packages
-  
+
+example: kyo install fastfetch or kyo i fastfetch
