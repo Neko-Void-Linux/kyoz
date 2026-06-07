@@ -1,0 +1,20 @@
+# Template file for 'kyoz'
+pkgname=kyoz
+version=2026
+revision=1
+build_style=zig-build
+hostmakedepends="zig"
+short_desc="Wrapper for xbps package manager"
+maintainer="Javierc"
+license="WTFPL"
+homepage="https://codeberg.org/javiercplus/kyoz"
+distfiles="https://codeberg.org/javiercplus/kyoz/archive/${version}.tar.gz"
+checksum=SKIP
+
+do_build() {
+	zig build-exe kyo.zig
+}
+
+do_install() {
+	vbin kyo
+}
