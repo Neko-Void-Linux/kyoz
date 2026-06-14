@@ -10,7 +10,7 @@ fn install(alloc: std.mem.Allocator, args: []const []const u8) !void {
     defer argv.deinit();
     try argv.append("sudo");
     try argv.append("xbps-install");
-    try argv.append("-Sy");
+    try argv.append("-S");
     try argv.appendSlice(args);
 
     var child = std.process.Child.init(argv.items, alloc);
