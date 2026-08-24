@@ -1,7 +1,7 @@
 # Template file for 'kyoz'
 pkgname=kyoz
 version=2026
-revision=2         
+revision=2
 build_style=zig-build
 hostmakedepends="zig"
 short_desc="Wrapper for xbps package manager"
@@ -12,9 +12,7 @@ distfiles="https://codeberg.org/javiercplus/kyoz/archive/${version}.tar.gz"
 checksum=13b96b345dd8a2209fbe3a7eb3f617b7c8effbe98c27c889b634beaec4ace04c
 
 do_build() {
-    zig build-exe kyo.zig \
-        -target ${XBPS_TARGET_MACHINE}-linux-${XBPS_TARGET_LIBC} \
-        -O ReleaseFast
+    zig build-exe kyo.zig -mcpu=baseline -O ReleaseSafe
 }
 
 do_install() {
