@@ -1,40 +1,51 @@
-Wrapper for xbps
+# Kyoz
 
-<a href="http://www.wtfpl.net/"><img
-       src="http://www.wtfpl.net/wp-content/uploads/2012/12/wtfpl-badge-4.png"
-       width="80" height="15" alt="WTFPL" /></a>
-       
-# COMPILE
-```
+A simple and lightweight command-line wrapper for the [XBPS](https://wiki.voidlinux.org/XBPS) package manager on Void Linux.
+
+## Requirements
+
+- Void Linux
+- [Zig](https://ziglang.org/) — only needed to build from source
+
+## Installation
+
+```sh
+# Install Zig if you haven't already
+sudo xbps-install -S zig
+
+# Compile from source
 zig build-exe kyo.zig
-```
-# INSTALL
-```
-cp kyo ~/.local/bin/ 
+
+# Install the binary
+cp kyo ~/.local/bin/
 ```
 
-# For compile do you need Zig
-```
-sudo xbps-install -S zig 
-```
-# Usage: 
+Make sure `~/.local/bin` is in your `PATH`.
+
+## Usage
+
+```sh
 kyo {install|update|remove|search|clean} [arguments...]
+```
 
-Commands:
-  install, i   <package...>   Install packages
-  
-  update, u                   Update the system
-  
-  remove, r    <package...>   Remove packages (with -o)
-  
-  search, s    <term...>      Search for packages
-  
-  clean, c                    Clean orphans and obsolete packages
+| Command | Alias | Arguments | Description |
+| :--- | :---: | :---: | :--- |
+| `install` | `i` | `<packages>` | Install packages |
+| `update` | `u` | — | Update the system |
+| `remove` | `r` | `<packages>` | Remove packages (with `-o`) |
+| `search` | `s` | `<query>` | Search for packages |
+| `clean` | `c` | — | Clean orphans and obsolete packages |
 
-# Example: for install fastfetch run...
-  
+## Examples
+
+```sh
+# Install fastfetch
 kyo install fastfetch
 
-or
-
+# Using the short alias
 kyo i fastfetch
+```
+
+## License
+
+Released under the [WTFPL](http://www.wtfpl.net/).
