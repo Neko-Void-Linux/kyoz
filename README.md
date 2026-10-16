@@ -28,6 +28,8 @@ Make sure `~/.local/bin` is in your `PATH`.
 kyo {install|update|remove|search|clean} [arguments...]
 ```
 
+Run `kyo --h` (`-h` or `--help` also work) to show every available option.
+
 | Command | Alias | Arguments | Description |
 | :--- | :---: | :---: | :--- |
 | `install` | `i` | `<packages>` | Install packages |
