@@ -5,7 +5,7 @@ A simple and lightweight command-line wrapper for the [XBPS](https://wiki.voidli
 ## Requirements
 
 - Void Linux
-- [Zig](https://ziglang.org/) — only needed to build from source
+- [Zig](https://ziglang.org/) - only needed to build from source
 
 ## Installation
 
