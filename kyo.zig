@@ -120,6 +120,11 @@ pub fn main() !void {
     const cmd = args[1];
     const rest = args[2..];
 
+    if (std.mem.eql(u8, cmd, "-h") or std.mem.eql(u8, cmd, "--h") or std.mem.eql(u8, cmd, "--help")) {
+        usage();
+        return;
+    }
+
     if (std.mem.eql(u8, cmd, "install") or std.mem.eql(u8, cmd, "i")) {
         try install(alloc, rest);
     } else if (std.mem.eql(u8, cmd, "update") or std.mem.eql(u8, cmd, "u")) {
