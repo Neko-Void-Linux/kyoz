@@ -1,0 +1,38 @@
+name: Build Kyoz
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Zig
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.14.1
+
+      - name: Compile project
+        run: zig build-exe kyo.zig -O ReleaseSafe -target x86_64-linux-musl
+
+      - name: Create tarball
+        run: tar -czvf kyoz.tar.gz kyo
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest build
+          body: "Build automático del commit ${{ github.sha }}"
+          files: |
+            kyo
+            kyoz.tar.gz
