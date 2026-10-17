@@ -6,7 +6,7 @@ A simple, lightweight wrapper for the [XBPS](https://wiki.voidlinux.org/XBPS) pa
 
 - Void Linux
 - [Zig](https://ziglang.org/) 0.14.x - only needed to build from source
-- `sudo` at runtime for package operations
+- `sudo`, `doas`, or `su` at runtime for package operations (the first one found in `PATH` is used; `su -c` is the last resort)
 
 ## Build
 

@@ -1,5 +1,7 @@
 const std = @import("std");
 
+const Escalator = enum { sudo, doas, su };
+
 fn runCommand(alloc: std.mem.Allocator, argv: []const []const u8) !u8 {
     var child = std.process.Child.init(argv, alloc);
     const term = try child.spawnAndWait();
@@ -7,6 +9,70 @@ fn runCommand(alloc: std.mem.Allocator, argv: []const []const u8) !u8 {
         .Exited => |code| code,
         else => 1,
     };
+}
+
+fn hasExecutable(alloc: std.mem.Allocator, name: []const u8) bool {
+    const path = std.posix.getenv("PATH") orelse return false;
+    var dirs = std.mem.splitScalar(u8, path, ':');
+    while (dirs.next()) |dir| {
+        if (dir.len == 0) continue;
+        const full = std.fs.path.join(alloc, &.{ dir, name }) catch continue;
+        defer alloc.free(full);
+        std.fs.accessAbsolute(full, .{}) catch continue;
+        return true;
+    }
+    return false;
+}
+
+fn detectEscalator(alloc: std.mem.Allocator) Escalator {
+    if (hasExecutable(alloc, "sudo")) return .sudo;
+    if (hasExecutable(alloc, "doas")) return .doas;
+    return .su;
+}
+
+fn buildShellCommand(alloc: std.mem.Allocator, argv: []const []const u8) ![]u8 {
+    var buf = std.ArrayList(u8).init(alloc);
+    errdefer buf.deinit();
+    const writer = buf.writer();
+    for (argv, 0..) |arg, index| {
+        if (index != 0) try writer.writeByte(' ');
+        try writer.writeByte('\'');
+        for (arg) |char| {
+            if (char == '\'') {
+                try writer.writeAll("'\\''");
+            } else {
+                try writer.writeByte(char);
+            }
+        }
+        try writer.writeByte('\'');
+    }
+    return buf.toOwnedSlice();
+}
+
+fn runPrivileged(alloc: std.mem.Allocator, command: []const []const u8) !u8 {
+    var argv = std.ArrayList([]const u8).init(alloc);
+    defer argv.deinit();
+
+    switch (detectEscalator(alloc)) {
+        .sudo => {
+            try argv.append("sudo");
+            try argv.appendSlice(command);
+        },
+        .doas => {
+            try argv.append("doas");
+            try argv.appendSlice(command);
+        },
+        .su => {
+            const shell_command = try buildShellCommand(alloc, command);
+            defer alloc.free(shell_command);
+            try argv.append("su");
+            try argv.append("-c");
+            try argv.append(shell_command);
+            return runCommand(alloc, argv.items);
+        },
+    }
+
+    return runCommand(alloc, argv.items);
 }
 
 pub fn install(alloc: std.mem.Allocator, args: []const []const u8) !u8 {
@@ -19,27 +85,26 @@ pub fn install(alloc: std.mem.Allocator, args: []const []const u8) !u8 {
         try stdout.print("Installing...\n", .{});
     }
 
-    var argv = std.ArrayList([]const u8).init(alloc);
-    defer argv.deinit();
-    try argv.append("sudo");
-    try argv.append("xbps-install");
-    try argv.append("-S");
-    try argv.appendSlice(args);
-    return runCommand(alloc, argv.items);
+    var command = std.ArrayList([]const u8).init(alloc);
+    defer command.deinit();
+    try command.append("xbps-install");
+    try command.append("-S");
+    try command.appendSlice(args);
+    return runPrivileged(alloc, command.items);
 }
 
 pub fn update(alloc: std.mem.Allocator) !u8 {
     const stdout = std.io.getStdOut().writer();
     try stdout.print("Updating...\n", .{});
-    const argv = &[_][]const u8{ "sudo", "xbps-install", "-Syu" };
-    return runCommand(alloc, argv);
+    const command = &[_][]const u8{ "xbps-install", "-Syu" };
+    return runPrivileged(alloc, command);
 }
 
 pub fn clean(alloc: std.mem.Allocator) !u8 {
     const stdout = std.io.getStdOut().writer();
     try stdout.print("Cleaning...\n", .{});
-    const argv = &[_][]const u8{ "sudo", "xbps-remove", "-oO" };
-    return runCommand(alloc, argv);
+    const command = &[_][]const u8{ "xbps-remove", "-oO" };
+    return runPrivileged(alloc, command);
 }
 
 pub fn remove(alloc: std.mem.Allocator, args: []const []const u8) !u8 {
@@ -52,13 +117,12 @@ pub fn remove(alloc: std.mem.Allocator, args: []const []const u8) !u8 {
         try stdout.print("Removing...\n", .{});
     }
 
-    var argv = std.ArrayList([]const u8).init(alloc);
-    defer argv.deinit();
-    try argv.append("sudo");
-    try argv.append("xbps-remove");
-    try argv.append("-o");
-    try argv.appendSlice(args);
-    return runCommand(alloc, argv.items);
+    var command = std.ArrayList([]const u8).init(alloc);
+    defer command.deinit();
+    try command.append("xbps-remove");
+    try command.append("-o");
+    try command.appendSlice(args);
+    return runPrivileged(alloc, command.items);
 }
 
 pub fn search(alloc: std.mem.Allocator, args: []const []const u8) !u8 {
@@ -71,13 +135,12 @@ pub fn search(alloc: std.mem.Allocator, args: []const []const u8) !u8 {
         try stdout.print("Searching...\n", .{});
     }
 
-    var argv = std.ArrayList([]const u8).init(alloc);
-    defer argv.deinit();
-    try argv.append("sudo");
-    try argv.append("xbps-query");
-    try argv.append("-Rs");
-    try argv.appendSlice(args);
-    return runCommand(alloc, argv.items);
+    var command = std.ArrayList([]const u8).init(alloc);
+    defer command.deinit();
+    try command.append("xbps-query");
+    try command.append("-Rs");
+    try command.appendSlice(args);
+    return runPrivileged(alloc, command.items);
 }
 
 pub fn usage() void {

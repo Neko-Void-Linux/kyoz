@@ -1,10 +1,9 @@
 # Template file for 'kyoz'
 pkgname=kyoz
 version=2026
-revision=3
+revision=4
 build_style=zig-build
 hostmakedepends="zig"
-depends="sudo"
 short_desc="Wrapper for the xbps package manager"
 maintainer="Javierc"
 license="WTFPL"
