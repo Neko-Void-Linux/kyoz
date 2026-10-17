@@ -1,5 +1,7 @@
 # Kyoz
 
+**English** | [Español](README.es.md)
+
 A simple, lightweight wrapper for the [XBPS](https://wiki.voidlinux.org/XBPS) package manager on Void Linux, written in [Zig](https://ziglang.org/).
 
 ## Requirements
