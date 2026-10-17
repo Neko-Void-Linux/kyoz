@@ -35,7 +35,7 @@ También puedes descargar un binario precompilado desde la [última release](htt
 ## Uso
 
 ```sh
-kyo {install|update|remove|search|clean} [argumentos...]
+kyo {install|update|remove|search|list|clean} [argumentos...]
 ```
 
 Ejecuta `kyo --h` (`-h` o `--help` también funcionan) para ver todas las opciones disponibles, y `kyo --version` (`-v` también funciona) para mostrar la versión.
@@ -46,6 +46,7 @@ Ejecuta `kyo --h` (`-h` o `--help` también funcionan) para ver todas las opcion
 | `update` | `u` | — | Actualizar el sistema |
 | `remove` | `r` | `<paquetes>` | Eliminar paquetes (con `-o`) |
 | `search` | `s` | `<término>` | Buscar paquetes |
+| `list` | `-l`, `--list` | `[patrón]` | Listar paquetes instalados |
 | `clean` | `c` | — | Limpiar paquetes huérfanos y obsoletos |
 
 ## Menú interactivo
@@ -74,6 +75,9 @@ kyo i fastfetch
 
 # Buscar un paquete
 kyo search neovim
+
+# Listar paquetes instalados
+kyo list
 ```
 
 ## Licencia
