@@ -54,7 +54,7 @@ Ejecuta `kyo --h` (`-h` o `--help` también funcionan) para ver todas las opcion
 
 Ejecutar `kyo` sin argumentos en una terminal abre un menú interactivo a pantalla completa:
 
-<img width="683" height="477" alt="image" src="https://github.com/user-attachments/assets/0153d8a8-b0ca-4a44-b83d-96cc7c670af9" />
+<img width="843" height="524" alt="image" src="https://github.com/user-attachments/assets/4203a0b6-b673-4942-8be5-541a24bdb093" />
 
 
 | Tecla | Acción |
