@@ -1,6 +1,6 @@
 const std = @import("std");
 
-pub const version = "2.0.0";
+pub const version = "2.0.1";
 
 const Escalator = enum { sudo, doas, su };
 
