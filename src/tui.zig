@@ -4,7 +4,7 @@ const xbps = @import("xbps.zig");
 
 pub const Lang = enum { en, es };
 
-const Action = enum { install, search, update, remove, clean, quit };
+const Action = enum { install, search, list, update, remove, clean, quit };
 
 const Label = struct { en: []const u8, es: []const u8 };
 
@@ -17,6 +17,7 @@ const MenuItem = struct {
 const menu_items = [_]MenuItem{
     .{ .icon = "󰉍", .label = .{ .en = "Install New Package", .es = "Instalar paquete" }, .action = .install },
     .{ .icon = "󰍉", .label = .{ .en = "Search Packages", .es = "Buscar paquetes" }, .action = .search },
+    .{ .icon = "󰉋", .label = .{ .en = "List Installed Packages", .es = "Listar paquetes instalados" }, .action = .list },
     .{ .icon = "󰚰", .label = .{ .en = "Update Applications", .es = "Actualizar aplicaciones" }, .action = .update },
     .{ .icon = "󰆴", .label = .{ .en = "Uninstall Application", .es = "Desinstalar aplicación" }, .action = .remove },
     .{ .icon = "󰃢", .label = .{ .en = "Clean Orphans", .es = "Limpiar huérfanos" }, .action = .clean },
@@ -243,6 +244,7 @@ fn runMenuAction(alloc: std.mem.Allocator, io: std.Io, path: []const u8, action:
         .quit => return false,
         .update => _ = try xbps.update(io, alloc, path),
         .clean => _ = try xbps.clean(io, alloc, path),
+        .list => _ = try xbps.listPackages(io, alloc, &.{}),
         .install, .remove, .search => {
             const prompt = promptText(lang, action);
             const line = try term.readLine(io, alloc, prompt);
