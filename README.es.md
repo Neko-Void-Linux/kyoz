@@ -35,7 +35,7 @@ También puedes descargar un binario precompilado desde la [última release](htt
 ## Uso
 
 ```sh
-kyo {install|update|remove|search|list|clean} [argumentos...]
+kyo {install|update|remove|search|info|list|clean} [argumentos...]
 ```
 
 Ejecuta `kyo --h` (`-h` o `--help` también funcionan) para ver todas las opciones disponibles, y `kyo --version` (`-v` también funciona) para mostrar la versión.
@@ -46,6 +46,7 @@ Ejecuta `kyo --h` (`-h` o `--help` también funcionan) para ver todas las opcion
 | `update` | `u` | — | Actualizar el sistema |
 | `remove` | `r` | `<paquetes>` | Eliminar paquetes (con `-o`) |
 | `search` | `s` | `<término>` | Buscar paquetes |
+| `info` | `-i`, `--info` | `<paquetes>` | Mostrar información de un paquete |
 | `list` | `-l`, `--list` | `[patrón]` | Listar paquetes instalados |
 | `clean` | `c` | — | Limpiar paquetes huérfanos y obsoletos |
 
@@ -66,6 +67,8 @@ Ejecutar `kyo` sin argumentos en una terminal abre un menú interactivo a pantal
 
 También se puede abrir explícitamente con `kyo tui` (o `kyo menu`).
 
+Las operaciones de instalar, eliminar, actualizar y limpiar piden confirmación antes de ejecutarse.
+
 ## Ejemplos
 
 ```sh
@@ -78,6 +81,9 @@ kyo search neovim
 
 # Listar paquetes instalados
 kyo list
+
+# Mostrar información de un paquete
+kyo info neovim
 ```
 
 ## Licencia
