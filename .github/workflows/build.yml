@@ -27,12 +27,37 @@ jobs:
       - name: Create tarball
         run: tar -czvf kyoz.tar.gz kyo
 
+      - name: Checksums
+        run: sha256sum kyo kyoz.tar.gz > SHA256SUMS
+
+      - name: Prepare release notes
+        run: |
+          KYO_SHA=$(awk '$2=="kyo" {print $1}' SHA256SUMS)
+          TARBALL_SHA=$(awk '$2=="kyoz.tar.gz" {print $1}' SHA256SUMS)
+          {
+            echo "## Fast install"
+            echo
+            echo '```sh'
+            echo "curl -fsSL https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/kyo -o /tmp/kyo && install -Dm755 /tmp/kyo ~/.local/bin/kyo"
+            echo '```'
+            echo
+            echo "Make sure \`~/.local/bin\` is in your \`PATH\`."
+            echo
+            echo "### Checksums"
+            echo
+            echo "- \`kyo\` — \`sha256:${KYO_SHA}\`"
+            echo "- \`kyoz.tar.gz\` — \`sha256:${TARBALL_SHA}\`"
+            echo
+            echo "Built from commit \`${GITHUB_SHA}\`."
+          } > RELEASE_NOTES.md
+
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest
           name: Latest build
-          body: "Build automático del commit ${{ github.sha }}"
+          body_path: RELEASE_NOTES.md
           files: |
             kyo
             kyoz.tar.gz
+            SHA256SUMS
