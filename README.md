@@ -1,26 +1,34 @@
 # Kyoz
 
-A simple and lightweight command-line wrapper for the [XBPS](https://wiki.voidlinux.org/XBPS) package manager on Void Linux.
+A simple, lightweight wrapper for the [XBPS](https://wiki.voidlinux.org/XBPS) package manager on Void Linux, written in [Zig](https://ziglang.org/).
 
 ## Requirements
 
 - Void Linux
-- [Zig](https://ziglang.org/) - only needed to build from source
+- [Zig](https://ziglang.org/) 0.14.x - only needed to build from source
+- `sudo` at runtime for package operations
 
-## Installation
+## Build
 
 ```sh
 # Install Zig if you haven't already
 sudo xbps-install -S zig
 
-# Compile from source
-zig build-exe kyo.zig
+# Get the sources and compile
+git clone https://github.com/Neko-Void-Linux/kyoz
+cd kyoz
+zig build-exe kyo.zig -O ReleaseSafe
+```
 
-# Install the binary
-cp kyo ~/.local/bin/
+## Install
+
+```sh
+install -Dm 755 kyo ~/.local/bin/kyo
 ```
 
 Make sure `~/.local/bin` is in your `PATH`.
+
+You can also grab a prebuilt binary from the [latest release](https://github.com/Neko-Void-Linux/kyoz/releases/latest).
 
 ## Usage
 
@@ -43,9 +51,10 @@ Run `kyo --h` (`-h` or `--help` also work) to show every available option.
 ```sh
 # Install fastfetch
 kyo install fastfetch
-
-# Using the short alias
 kyo i fastfetch
+
+# Search for a package
+kyo search neovim
 ```
 
 ## License
