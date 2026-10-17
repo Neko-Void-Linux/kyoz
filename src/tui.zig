@@ -1,5 +1,6 @@
 const std = @import("std");
 const term = @import("term.zig");
+const xbps = @import("xbps.zig");
 
 const Action = enum { install, search, update, remove, clean, quit };
 
@@ -129,4 +130,143 @@ fn drawMenu(out: anytype, size: term.Size, selected: usize) !void {
 
     try drawBottomRow(out, cols, rows);
     try moveTo(out, rows, 1);
+}
+
+const info_lines = [_][]const u8{
+    "kyoz",
+    "Wrapper for xbps (Void Linux)",
+    "",
+    "Creator:       JavierC (javiercplus)",
+    "Collaborator:  Ars-byte",
+    "Repository:    github.com/Neko-Void-Linux/kyoz",
+    "License:       WTFPL",
+    "Made with:     Zig",
+    "",
+    "Press any key to return",
+};
+
+fn drawInfo(out: anytype, size: term.Size) !void {
+    const cols = size.cols;
+    const rows = size.rows;
+    const inner = if (cols >= 2) cols - 2 else 0;
+    const interior = if (rows >= 2) rows - 2 else 0;
+
+    try out.writeAll("\x1b[2J\x1b[?25l");
+    try drawTopRow(out, cols, 1, "KYOZ · INFO");
+
+    var max_width: usize = 0;
+    for (info_lines) |line| {
+        if (term.displayWidth(line) > max_width) max_width = term.displayWidth(line);
+    }
+    const block_left = if (inner > max_width) (inner - max_width) / 2 else 0;
+
+    var start: usize = 0;
+    if (interior > info_lines.len) start = (interior - info_lines.len) / 2;
+
+    var index: usize = 0;
+    while (index < interior) : (index += 1) {
+        const row = index + 2;
+        if (index >= start and index < start + info_lines.len) {
+            try drawTextRow(out, cols, row, info_lines[index - start], block_left);
+        } else {
+            try drawBlankRow(out, cols, row);
+        }
+    }
+
+    try drawBottomRow(out, cols, rows);
+    try moveTo(out, rows, 1);
+}
+
+fn runMenuAction(alloc: std.mem.Allocator, action: Action) !bool {
+    const out = std.io.getStdOut().writer();
+
+    switch (action) {
+        .quit => return false,
+        .update => _ = try xbps.update(alloc),
+        .clean => _ = try xbps.clean(alloc),
+        .install, .remove, .search => {
+            const prompt = switch (action) {
+                .install => "Package(s) to install: ",
+                .remove => "Package(s) to remove: ",
+                .search => "Search: ",
+                else => "",
+            };
+            const line = try term.readLine(alloc, prompt);
+            defer alloc.free(line);
+
+            var params = std.ArrayList([]const u8).init(alloc);
+            defer params.deinit();
+            var tokens = std.mem.tokenizeAny(u8, line, " \t");
+            while (tokens.next()) |token| try params.append(token);
+
+            if (params.items.len == 0) return true;
+
+            switch (action) {
+                .install => _ = try xbps.install(alloc, params.items),
+                .remove => _ = try xbps.remove(alloc, params.items),
+                .search => _ = try xbps.search(alloc, params.items),
+                else => {},
+            }
+        },
+    }
+
+    try out.print("\n[press Enter to return to menu] ", .{});
+    term.waitEnter();
+    return true;
+}
+
+pub fn run(alloc: std.mem.Allocator) !void {
+    const stdout = std.io.getStdOut();
+    const out = stdout.writer();
+    const original = try term.enterRawMode();
+    defer term.restoreMode(original);
+
+    var size = term.getSize();
+    var selected: usize = 0;
+    try drawMenu(out, size, selected);
+
+    var running = true;
+    while (running) {
+        var fds = [_]std.posix.pollfd{.{ .fd = std.posix.STDIN_FILENO, .events = std.posix.POLL.IN, .revents = 0 }};
+        _ = std.posix.poll(&fds, 120) catch 0;
+
+        const current = term.getSize();
+        if (current.rows != size.rows or current.cols != size.cols) {
+            size = current;
+            try drawMenu(out, size, selected);
+        }
+
+        if ((fds[0].revents & std.posix.POLL.IN) == 0) continue;
+
+        switch (term.readKey()) {
+            .up => {
+                selected = if (selected == 0) menu_items.len - 1 else selected - 1;
+                try drawMenu(out, size, selected);
+            },
+            .down => {
+                selected = (selected + 1) % menu_items.len;
+                try drawMenu(out, size, selected);
+            },
+            .info => {
+                try drawInfo(out, size);
+                _ = term.readKey();
+                size = term.getSize();
+                try drawMenu(out, size, selected);
+            },
+            .quit => running = false,
+            .enter => {
+                term.restoreMode(original);
+                try stdout.writeAll("\x1b[2J\x1b[H\x1b[?25h");
+                running = try runMenuAction(alloc, menu_items[selected].action);
+                if (running) {
+                    _ = try term.enterRawMode();
+                    size = term.getSize();
+                    try drawMenu(out, size, selected);
+                }
+            },
+            else => {},
+        }
+    }
+
+    try stdout.writeAll("\x1b[0m\x1b[2J\x1b[H\x1b[?25h");
 }

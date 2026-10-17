@@ -92,6 +92,9 @@ pub fn usage() void {
         \\  search, s    <term...>      Search for packages
         \\  clean, c                     Clean orphans and obsolete packages
         \\
+        \\Run with no arguments to open the interactive menu.
+        \\  help, -h, --h, --help       Show this help
+        \\
     ) catch {};
 }
 
