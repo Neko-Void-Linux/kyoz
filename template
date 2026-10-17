@@ -1,4 +1,3 @@
-# Template file for 'kyoz'
 pkgname=kyoz
 version=2026
 revision=4
@@ -8,9 +7,9 @@ short_desc="Wrapper for the xbps package manager"
 maintainer="Javierc"
 license="WTFPL"
 homepage="https://github.com/Neko-Void-Linux/kyoz"
-_commit=96bde219ebd499a9dad3adcfe8f663562342c451
+_commit=725671dcc4945b7d3e32fbb23707c374be835b09
 distfiles="https://github.com/Neko-Void-Linux/kyoz/archive/${_commit}.tar.gz"
-checksum=bec6e7ead4b07e709921d22c4168ec28f194dfd23d48db75b50fa7359873bb5c
+checksum=5bb8c82a0bc1d1e8481fd3681283e004be902498d1c19a56dece06c43ebb7419
 
 do_build() {
     zig build-exe kyo.zig -mcpu=baseline -O ReleaseSafe
