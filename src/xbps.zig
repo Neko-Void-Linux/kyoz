@@ -152,6 +152,17 @@ pub fn search(io: std.Io, alloc: std.mem.Allocator, path: []const u8, args: []co
     return runPrivileged(io, alloc, path, command.items);
 }
 
+pub fn listPackages(io: std.Io, alloc: std.mem.Allocator, args: []const []const u8) !u8 {
+    try printOut(io, "Installed packages:\n", .{});
+
+    var command: std.ArrayList([]const u8) = .empty;
+    defer command.deinit(alloc);
+    try command.append(alloc, "xbps-query");
+    try command.append(alloc, "-l");
+    try command.appendSlice(alloc, args);
+    return runCommand(io, command.items);
+}
+
 pub fn printVersion(io: std.Io) !void {
     try printOut(io, "kyo {s}\n", .{version});
 }
@@ -160,13 +171,14 @@ pub fn usage(io: std.Io) !void {
     var buffer: [1024]u8 = undefined;
     var writer = std.Io.File.stdout().writerStreaming(io, &buffer);
     try writer.interface.writeAll(
-        \\Usage: kyo {install|update|remove|search|clean} [arguments...]
+        \\Usage: kyo {install|update|remove|search|list|clean} [arguments...]
         \\
         \\Commands:
         \\  install, i   <package...>   Install packages
         \\  update, u                    Update the system
         \\  remove, r    <package...>   Remove packages (with -o)
         \\  search, s    <term...>      Search for packages
+        \\  list, -l     [pattern]      List installed packages
         \\  clean, c                     Clean orphans and obsolete packages
         \\
         \\Run with no arguments to open the interactive menu.
@@ -182,6 +194,10 @@ pub fn dispatch(alloc: std.mem.Allocator, io: std.Io, path: []const u8, cmd: []c
     if (std.mem.eql(u8, cmd, "update") or std.mem.eql(u8, cmd, "u")) return update(io, alloc, path);
     if (std.mem.eql(u8, cmd, "remove") or std.mem.eql(u8, cmd, "r")) return remove(io, alloc, path, rest);
     if (std.mem.eql(u8, cmd, "search") or std.mem.eql(u8, cmd, "s")) return search(io, alloc, path, rest);
+    if (std.mem.eql(u8, cmd, "list") or std.mem.eql(u8, cmd, "-l") or
+        std.mem.eql(u8, cmd, "--l") or std.mem.eql(u8, cmd, "-list") or
+        std.mem.eql(u8, cmd, "--list"))
+        return listPackages(io, alloc, rest);
     if (std.mem.eql(u8, cmd, "clean") or std.mem.eql(u8, cmd, "c")) return clean(io, alloc, path);
 
     try printErr(io, "Unknown command: {s}\n", .{cmd});
