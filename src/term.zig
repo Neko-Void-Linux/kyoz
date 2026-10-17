@@ -40,8 +40,8 @@ pub fn enterRawMode() !posix.termios {
     raw.lflag.ICANON = false;
     raw.lflag.ECHO = false;
     raw.lflag.ISIG = false;
-    raw.cc[@intFromEnum(posix.V.MIN)] = 1;
-    raw.cc[@intFromEnum(posix.V.TIME)] = 0;
+    raw.cc[@backingInt(posix.V.MIN)] = 1;
+    raw.cc[@backingInt(posix.V.TIME)] = 0;
     try posix.tcsetattr(fd, .NOW, raw);
     return original;
 }
@@ -88,12 +88,14 @@ pub fn readKey() Key {
     }
 }
 
-pub fn readLine(alloc: std.mem.Allocator, prompt: []const u8) ![]u8 {
-    const out = std.io.getStdOut().writer();
-    try out.writeAll(prompt);
+pub fn readLine(io: std.Io, alloc: std.mem.Allocator, prompt: []const u8) ![]u8 {
+    var prompt_buffer: [256]u8 = undefined;
+    var prompt_writer = std.Io.File.stdout().writerStreaming(io, &prompt_buffer);
+    try prompt_writer.interface.writeAll(prompt);
+    try prompt_writer.interface.flush();
 
-    var buffer = std.ArrayList(u8).init(alloc);
-    errdefer buffer.deinit();
+    var buffer: std.ArrayList(u8) = .empty;
+    errdefer buffer.deinit(alloc);
 
     var byte: [1]u8 = undefined;
     while (true) {
@@ -101,9 +103,9 @@ pub fn readLine(alloc: std.mem.Allocator, prompt: []const u8) ![]u8 {
         if (count == 0) break;
         if (byte[0] == '\n') break;
         if (byte[0] == '\r') continue;
-        try buffer.append(byte[0]);
+        try buffer.append(alloc, byte[0]);
     }
-    return buffer.toOwnedSlice();
+    return buffer.toOwnedSlice(alloc);
 }
 
 pub fn waitEnter() void {

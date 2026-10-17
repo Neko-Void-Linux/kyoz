@@ -177,13 +177,15 @@ fn drawInfo(out: anytype, size: term.Size) !void {
     try moveTo(out, rows, 1);
 }
 
-fn runMenuAction(alloc: std.mem.Allocator, action: Action) !bool {
-    const out = std.io.getStdOut().writer();
+fn runMenuAction(alloc: std.mem.Allocator, io: std.Io, path: []const u8, action: Action) !bool {
+    var no_buffer: [0]u8 = .{};
+    var out_writer = std.Io.File.stdout().writerStreaming(io, &no_buffer);
+    const out = &out_writer.interface;
 
     switch (action) {
         .quit => return false,
-        .update => _ = try xbps.update(alloc),
-        .clean => _ = try xbps.clean(alloc),
+        .update => _ = try xbps.update(io, alloc, path),
+        .clean => _ = try xbps.clean(io, alloc, path),
         .install, .remove, .search => {
             const prompt = switch (action) {
                 .install => "Package(s) to install: ",
@@ -191,20 +193,20 @@ fn runMenuAction(alloc: std.mem.Allocator, action: Action) !bool {
                 .search => "Search: ",
                 else => "",
             };
-            const line = try term.readLine(alloc, prompt);
+            const line = try term.readLine(io, alloc, prompt);
             defer alloc.free(line);
 
-            var params = std.ArrayList([]const u8).init(alloc);
-            defer params.deinit();
+            var params: std.ArrayList([]const u8) = .empty;
+            defer params.deinit(alloc);
             var tokens = std.mem.tokenizeAny(u8, line, " \t");
-            while (tokens.next()) |token| try params.append(token);
+            while (tokens.next()) |token| try params.append(alloc, token);
 
             if (params.items.len == 0) return true;
 
             switch (action) {
-                .install => _ = try xbps.install(alloc, params.items),
-                .remove => _ = try xbps.remove(alloc, params.items),
-                .search => _ = try xbps.search(alloc, params.items),
+                .install => _ = try xbps.install(io, alloc, path, params.items),
+                .remove => _ = try xbps.remove(io, alloc, path, params.items),
+                .search => _ = try xbps.search(io, alloc, path, params.items),
                 else => {},
             }
         },
@@ -215,9 +217,10 @@ fn runMenuAction(alloc: std.mem.Allocator, action: Action) !bool {
     return true;
 }
 
-pub fn run(alloc: std.mem.Allocator) !void {
-    const stdout = std.io.getStdOut();
-    const out = stdout.writer();
+pub fn run(alloc: std.mem.Allocator, io: std.Io, path: []const u8) !void {
+    var no_buffer: [0]u8 = .{};
+    var out_writer = std.Io.File.stdout().writerStreaming(io, &no_buffer);
+    const out = &out_writer.interface;
     const original = try term.enterRawMode();
     defer term.restoreMode(original);
 
@@ -256,8 +259,8 @@ pub fn run(alloc: std.mem.Allocator) !void {
             .quit => running = false,
             .enter => {
                 term.restoreMode(original);
-                try stdout.writeAll("\x1b[2J\x1b[H\x1b[?25h");
-                running = try runMenuAction(alloc, menu_items[selected].action);
+                try out.writeAll("\x1b[2J\x1b[H\x1b[?25h");
+                running = try runMenuAction(alloc, io, path, menu_items[selected].action);
                 if (running) {
                     _ = try term.enterRawMode();
                     size = term.getSize();
@@ -268,5 +271,5 @@ pub fn run(alloc: std.mem.Allocator) !void {
         }
     }
 
-    try stdout.writeAll("\x1b[0m\x1b[2J\x1b[H\x1b[?25h");
+    try out.writeAll("\x1b[0m\x1b[2J\x1b[H\x1b[?25h");
 }
