@@ -4,7 +4,7 @@ const xbps = @import("xbps.zig");
 
 pub const Lang = enum { en, es };
 
-const Action = enum { install, search, list, update, remove, clean, quit };
+const Action = enum { install, search, list, info, update, remove, clean, quit };
 
 const Label = struct { en: []const u8, es: []const u8 };
 
@@ -18,6 +18,7 @@ const menu_items = [_]MenuItem{
     .{ .icon = "󰉍", .label = .{ .en = "Install New Package", .es = "Instalar paquete" }, .action = .install },
     .{ .icon = "󰍉", .label = .{ .en = "Search Packages", .es = "Buscar paquetes" }, .action = .search },
     .{ .icon = "󰉋", .label = .{ .en = "List Installed Packages", .es = "Listar paquetes instalados" }, .action = .list },
+    .{ .icon = "󰋼", .label = .{ .en = "Package Info", .es = "Información de paquete" }, .action = .info },
     .{ .icon = "󰚰", .label = .{ .en = "Update Applications", .es = "Actualizar aplicaciones" }, .action = .update },
     .{ .icon = "󰆴", .label = .{ .en = "Uninstall Application", .es = "Desinstalar aplicación" }, .action = .remove },
     .{ .icon = "󰃢", .label = .{ .en = "Clean Orphans", .es = "Limpiar huérfanos" }, .action = .clean },
@@ -51,8 +52,25 @@ fn promptText(lang: Lang, action: Action) []const u8 {
         .install => if (lang == .es) "Paquete(s) a instalar: " else "Package(s) to install: ",
         .remove => if (lang == .es) "Paquete(s) a eliminar: " else "Package(s) to remove: ",
         .search => if (lang == .es) "Buscar: " else "Search: ",
+        .info => if (lang == .es) "Paquete: " else "Package: ",
         else => "",
     };
+}
+
+fn confirmText(lang: Lang) []const u8 {
+    return if (lang == .es) "¿Seguro? [s/N] " else "Are you sure? [y/N] ";
+}
+
+fn cancelText(lang: Lang) []const u8 {
+    return if (lang == .es) "\n[operación cancelada]" else "\n[operation cancelled]";
+}
+
+fn confirm(io: std.Io, alloc: std.mem.Allocator, lang: Lang) !bool {
+    const line = try term.readLine(io, alloc, confirmText(lang));
+    defer alloc.free(line);
+    if (line.len == 0) return false;
+    const c = line[0];
+    return c == 'y' or c == 'Y' or c == 's' or c == 'S';
 }
 
 const info_en = [_][]const u8{
@@ -242,10 +260,22 @@ fn runMenuAction(alloc: std.mem.Allocator, io: std.Io, path: []const u8, action:
 
     switch (action) {
         .quit => return false,
-        .update => _ = try xbps.update(io, alloc, path),
-        .clean => _ = try xbps.clean(io, alloc, path),
+        .update => {
+            if (try confirm(io, alloc, lang)) {
+                _ = try xbps.update(io, alloc, path);
+            } else {
+                try out.print("{s}", .{cancelText(lang)});
+            }
+        },
+        .clean => {
+            if (try confirm(io, alloc, lang)) {
+                _ = try xbps.clean(io, alloc, path);
+            } else {
+                try out.print("{s}", .{cancelText(lang)});
+            }
+        },
         .list => _ = try xbps.listPackages(io, alloc, &.{}),
-        .install, .remove, .search => {
+        .install, .remove, .search, .info => {
             const prompt = promptText(lang, action);
             const line = try term.readLine(io, alloc, prompt);
             defer alloc.free(line);
@@ -258,9 +288,22 @@ fn runMenuAction(alloc: std.mem.Allocator, io: std.Io, path: []const u8, action:
             if (params.items.len == 0) return true;
 
             switch (action) {
-                .install => _ = try xbps.install(io, alloc, path, params.items),
-                .remove => _ = try xbps.remove(io, alloc, path, params.items),
+                .install => {
+                    if (try confirm(io, alloc, lang)) {
+                        _ = try xbps.install(io, alloc, path, params.items);
+                    } else {
+                        try out.print("{s}", .{cancelText(lang)});
+                    }
+                },
+                .remove => {
+                    if (try confirm(io, alloc, lang)) {
+                        _ = try xbps.remove(io, alloc, path, params.items);
+                    } else {
+                        try out.print("{s}", .{cancelText(lang)});
+                    }
+                },
                 .search => _ = try xbps.search(io, alloc, path, params.items),
+                .info => _ = try xbps.info(io, alloc, params.items),
                 else => {},
             }
         },
