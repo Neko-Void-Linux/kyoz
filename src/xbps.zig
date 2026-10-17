@@ -163,6 +163,20 @@ pub fn listPackages(io: std.Io, alloc: std.mem.Allocator, args: []const []const 
     return runCommand(io, command.items);
 }
 
+pub fn info(io: std.Io, alloc: std.mem.Allocator, args: []const []const u8) !u8 {
+    if (args.len == 0) {
+        try printErr(io, "Usage: kyo info <package...>\n", .{});
+        return 1;
+    }
+
+    var command: std.ArrayList([]const u8) = .empty;
+    defer command.deinit(alloc);
+    try command.append(alloc, "xbps-query");
+    try command.append(alloc, "-RS");
+    try command.appendSlice(alloc, args);
+    return runCommand(io, command.items);
+}
+
 pub fn printVersion(io: std.Io) !void {
     try printOut(io, "kyo {s}\n", .{version});
 }
@@ -171,13 +185,14 @@ pub fn usage(io: std.Io) !void {
     var buffer: [1024]u8 = undefined;
     var writer = std.Io.File.stdout().writerStreaming(io, &buffer);
     try writer.interface.writeAll(
-        \\Usage: kyo {install|update|remove|search|list|clean} [arguments...]
+        \\Usage: kyo {install|update|remove|search|info|list|clean} [arguments...]
         \\
         \\Commands:
         \\  install, i   <package...>   Install packages
         \\  update, u                    Update the system
         \\  remove, r    <package...>   Remove packages (with -o)
         \\  search, s    <term...>      Search for packages
+        \\  info, -i     <package...>   Show package information
         \\  list, -l     [pattern]      List installed packages
         \\  clean, c                     Clean orphans and obsolete packages
         \\
@@ -194,6 +209,10 @@ pub fn dispatch(alloc: std.mem.Allocator, io: std.Io, path: []const u8, cmd: []c
     if (std.mem.eql(u8, cmd, "update") or std.mem.eql(u8, cmd, "u")) return update(io, alloc, path);
     if (std.mem.eql(u8, cmd, "remove") or std.mem.eql(u8, cmd, "r")) return remove(io, alloc, path, rest);
     if (std.mem.eql(u8, cmd, "search") or std.mem.eql(u8, cmd, "s")) return search(io, alloc, path, rest);
+    if (std.mem.eql(u8, cmd, "info") or std.mem.eql(u8, cmd, "-i") or
+        std.mem.eql(u8, cmd, "--i") or std.mem.eql(u8, cmd, "-info") or
+        std.mem.eql(u8, cmd, "--info"))
+        return info(io, alloc, rest);
     if (std.mem.eql(u8, cmd, "list") or std.mem.eql(u8, cmd, "-l") or
         std.mem.eql(u8, cmd, "--l") or std.mem.eql(u8, cmd, "-list") or
         std.mem.eql(u8, cmd, "--list"))
