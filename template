@@ -7,9 +7,9 @@ short_desc="Wrapper for the xbps package manager"
 maintainer="Javierc"
 license="WTFPL"
 homepage="https://github.com/Neko-Void-Linux/kyoz"
-_commit=725671dcc4945b7d3e32fbb23707c374be835b09
+_commit=6918e2e7af97e5581aa41020751ef544d98c7b79
 distfiles="https://github.com/Neko-Void-Linux/kyoz/archive/${_commit}.tar.gz"
-checksum=5bb8c82a0bc1d1e8481fd3681283e004be902498d1c19a56dece06c43ebb7419
+checksum=6817e2b5f90bb6ef4572459efacffd5164579e98bc3a2db571bd0ce81ef5ab0e
 
 do_build() {
     zig build-exe kyo.zig -mcpu=baseline -O ReleaseSafe
