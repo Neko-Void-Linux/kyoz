@@ -50,6 +50,9 @@ Run `kyo --h` (`-h` or `--help` also work) to show every available option.
 
 Running `kyo` with no arguments on a terminal opens a fullscreen interactive menu:
 
+<img width="731" height="513" alt="image" src="https://github.com/user-attachments/assets/caf36de5-35db-422f-8865-baf72c7adfb3" />
+
+
 | Key | Action |
 | :--- | :--- |
 | `↑` / `↓` (or `k` / `j`) | Move |
