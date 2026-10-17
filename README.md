@@ -60,6 +60,7 @@ Running `kyo` with no arguments on a terminal opens a fullscreen interactive men
 | `↑` / `↓` (or `k` / `j`) | Move |
 | `Enter` | Select |
 | `i` or `?` | Info screen |
+| `l` | Switch language (English / Spanish) |
 | `q` (or `Ctrl-C`) | Quit |
 
 It can also be opened explicitly with `kyo tui` (or `kyo menu`).

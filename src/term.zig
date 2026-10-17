@@ -64,7 +64,7 @@ pub fn readByteTimeout(timeout_ms: i32) ?u8 {
     return readByte();
 }
 
-pub const Key = enum { up, down, enter, info, quit, other };
+pub const Key = enum { up, down, enter, info, lang, quit, other };
 
 pub fn readKey() Key {
     const first = readByte() orelse return .quit;
@@ -84,6 +84,7 @@ pub fn readKey() Key {
         'k' => return .up,
         'j' => return .down,
         'i', '?' => return .info,
+        'l' => return .lang,
         else => return .other,
     }
 }

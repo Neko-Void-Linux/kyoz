@@ -60,6 +60,7 @@ Ejecutar `kyo` sin argumentos en una terminal abre un menú interactivo a pantal
 | `↑` / `↓` (o `k` / `j`) | Moverse |
 | `Enter` | Seleccionar |
 | `i` o `?` | Pantalla de información |
+| `l` | Cambiar idioma (inglés / español) |
 | `q` (o `Ctrl-C`) | Salir |
 
 También se puede abrir explícitamente con `kyo tui` (o `kyo menu`).
