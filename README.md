@@ -38,7 +38,7 @@ You can also grab a prebuilt binary from the [latest release](https://github.com
 kyo {install|update|remove|search|clean} [arguments...]
 ```
 
-Run `kyo --h` (`-h` or `--help` also work) to show every available option.
+Run `kyo --h` (`-h` or `--help` also work) to show every available option, and `kyo --version` (`-v` also works) to print the version.
 
 | Command | Alias | Arguments | Description |
 | :--- | :---: | :---: | :--- |

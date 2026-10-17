@@ -1,5 +1,7 @@
 const std = @import("std");
 
+pub const version = "2.0.0";
+
 const Escalator = enum { sudo, doas, su };
 
 fn printOut(io: std.Io, comptime fmt: []const u8, args: anytype) !void {
@@ -150,6 +152,10 @@ pub fn search(io: std.Io, alloc: std.mem.Allocator, path: []const u8, args: []co
     return runPrivileged(io, alloc, path, command.items);
 }
 
+pub fn printVersion(io: std.Io) !void {
+    try printOut(io, "kyo {s}\n", .{version});
+}
+
 pub fn usage(io: std.Io) !void {
     var buffer: [1024]u8 = undefined;
     var writer = std.Io.File.stdout().writerStreaming(io, &buffer);
@@ -165,6 +171,7 @@ pub fn usage(io: std.Io) !void {
         \\
         \\Run with no arguments to open the interactive menu.
         \\  help, -h, --h, --help       Show this help
+        \\  version, -v, --version      Show the version
         \\
     );
     try writer.interface.flush();

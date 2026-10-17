@@ -34,6 +34,13 @@ pub fn main(init: std.process.Init) !void {
         return;
     }
 
+    if (std.mem.eql(u8, cmd, "version") or std.mem.eql(u8, cmd, "-v") or
+        std.mem.eql(u8, cmd, "--version"))
+    {
+        try xbps.printVersion(io);
+        return;
+    }
+
     if (std.mem.eql(u8, cmd, "tui") or std.mem.eql(u8, cmd, "menu")) {
         try tui.run(alloc, io, path);
         return;

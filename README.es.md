@@ -38,7 +38,7 @@ También puedes descargar un binario precompilado desde la [última release](htt
 kyo {install|update|remove|search|clean} [argumentos...]
 ```
 
-Ejecuta `kyo --h` (`-h` o `--help` también funcionan) para ver todas las opciones disponibles.
+Ejecuta `kyo --h` (`-h` o `--help` también funcionan) para ver todas las opciones disponibles, y `kyo --version` (`-v` también funciona) para mostrar la versión.
 
 | Comando | Alias | Argumentos | Descripción |
 | :--- | :---: | :---: | :--- |
