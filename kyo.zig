@@ -29,13 +29,15 @@ pub fn main(init: std.process.Init) !void {
     const rest = args.items[2..];
 
     if (std.mem.eql(u8, cmd, "help") or std.mem.eql(u8, cmd, "-h") or
-        std.mem.eql(u8, cmd, "--h") or std.mem.eql(u8, cmd, "--help"))
+        std.mem.eql(u8, cmd, "--h") or std.mem.eql(u8, cmd, "-help") or
+        std.mem.eql(u8, cmd, "--help"))
     {
         try xbps.usage(io);
         return;
     }
 
     if (std.mem.eql(u8, cmd, "version") or std.mem.eql(u8, cmd, "-v") or
+        std.mem.eql(u8, cmd, "--v") or std.mem.eql(u8, cmd, "-version") or
         std.mem.eql(u8, cmd, "--version"))
     {
         try xbps.printVersion(io);
