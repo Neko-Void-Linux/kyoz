@@ -46,6 +46,19 @@ Run `kyo --h` (`-h` or `--help` also work) to show every available option.
 | `search` | `s` | `<query>` | Search for packages |
 | `clean` | `c` | — | Clean orphans and obsolete packages |
 
+## Interactive menu
+
+Running `kyo` with no arguments on a terminal opens a fullscreen interactive menu:
+
+| Key | Action |
+| :--- | :--- |
+| `↑` / `↓` (or `k` / `j`) | Move |
+| `Enter` | Select |
+| `i` or `?` | Info screen |
+| `q` (or `Ctrl-C`) | Quit |
+
+It can also be opened explicitly with `kyo tui` (or `kyo menu`).
+
 ## Examples
 
 ```sh
