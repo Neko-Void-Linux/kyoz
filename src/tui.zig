@@ -30,7 +30,7 @@ fn labelText(label: Label, lang: Lang) []const u8 {
 }
 
 fn titleText(lang: Lang) []const u8 {
-    return if (lang == .es) "KYOZ · GESTOR DE PAQUETES" else "KYOZ PACKAGE MANAGER";
+    return if (lang == .es) "KYOZ · GESTOR DE XBPS" else "KYOZ XBPS MAMAGER";
 }
 
 fn hintText(lang: Lang) []const u8 {
