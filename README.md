@@ -54,7 +54,7 @@ Run `kyo --h` (`-h` or `--help` also work) to show every available option, and `
 
 Running `kyo` with no arguments on a terminal opens a fullscreen interactive menu:
 
-<img width="849" height="525" alt="image" src="https://github.com/user-attachments/assets/f3785597-3cb8-4830-b9df-4dd91cde71dc" />
+<img width="1274" height="670" alt="image" src="https://github.com/user-attachments/assets/6c2c6253-295a-4ad5-be1b-23d42890ad27" />
 
 
 | Key | Action |
